@@ -57,7 +57,11 @@
     if (self) {        
 #if TARGET_OS_IPHONE
         _backgroundPolicy = RKRequestBackgroundPolicyNone;
-        _backgroundTaskIdentifier = UIBackgroundTaskInvalid;    
+        _backgroundTaskIdentifier = 0; 
+        BOOL backgroundOK = &UIBackgroundTaskInvalid != NULL;
+        if (backgroundOK) {
+            _backgroundTaskIdentifier = UIBackgroundTaskInvalid; 
+        }
 #endif
     }
     
@@ -66,7 +70,8 @@
 
 - (void)cleanupBackgroundTask {
     #if TARGET_OS_IPHONE
-    if (UIBackgroundTaskInvalid == self.backgroundTaskIdentifier) {
+    BOOL backgroundOK = &UIBackgroundTaskInvalid != NULL;
+    if (backgroundOK && UIBackgroundTaskInvalid == self.backgroundTaskIdentifier) {
         return;
     }
     
@@ -208,7 +213,16 @@
 }
 
 - (void)sendAsynchronously {
-	if ([self shouldDispatchRequest]) {        
+    if (self.cachePolicy & RKRequestCachePolicyEnabled) {
+        if ([[[RKClient sharedClient] cache] hasResponseForRequest:self]) {
+            NSLog(@"Found cached content, loading...");
+            _isLoading = YES;
+            [self didFinishLoad:[[[RKClient sharedClient] cache] responseForRequest:self]];
+            return;
+        }
+    }
+    
+	if ([self shouldDispatchRequest]) {
 #if TARGET_OS_IPHONE
         // Background Request Policy support
         UIApplication* app = [UIApplication sharedApplication];

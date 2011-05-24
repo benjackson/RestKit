@@ -70,14 +70,17 @@ static const NSTimeInterval kFlushDelay = 0.3;
 													 name:RKRequestFailedWithErrorNotification
 												   object:nil];
 #if TARGET_OS_IPHONE
-        [[NSNotificationCenter defaultCenter] addObserver:self 
-                                                 selector:@selector(willTransitionToBackground) 
-                                                     name:UIApplicationDidEnterBackgroundNotification 
-                                                   object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(willTransitionToForeground)
-                                                     name:UIApplicationWillEnterForegroundNotification
-                                                   object:nil];
+        BOOL backgroundOK = &UIApplicationDidEnterBackgroundNotification != NULL;
+        if (backgroundOK) {
+            [[NSNotificationCenter defaultCenter] addObserver:self 
+                                                     selector:@selector(willTransitionToBackground) 
+                                                         name:UIApplicationDidEnterBackgroundNotification 
+                                                       object:nil];
+            [[NSNotificationCenter defaultCenter] addObserver:self
+                                                     selector:@selector(willTransitionToForeground)
+                                                         name:UIApplicationWillEnterForegroundNotification
+                                                       object:nil];
+        }
 #endif
 	}
 	return self;

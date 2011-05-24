@@ -40,6 +40,9 @@ typedef enum {
 
 	// Load from the cache if we have data stored and the server returns a 304 (not modified) response
     RKRequestCachePolicyEtag = 1 << 2,
+    
+    // Load from the cache if we have data stored
+    RKRequestCachePolicyEnabled = 1 << 3,
 
     RKRequestCachePolicyDefault = RKRequestCachePolicyEtag
 } RKRequestCachePolicy;
